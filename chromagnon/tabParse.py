@@ -32,7 +32,8 @@ This module parses SNSS tab commands used to store session states in chrome
 
 import datetime
 import struct
-import StringIO
+from io import BytesIO
+StringIO = BytesIO
 import sys
 
 import chromagnon.pickle as pickle
@@ -52,8 +53,8 @@ def parse(commandList):
     output = []
 
     for command in commandList:
-        if TYPE_DICT.has_key(str(command.idType)):
-            content = StringIO.StringIO(command.content)
+        if TYPE_DICT.get(str(command.idType)):
+            content = StringIO(command.content)
             commandClass = sys.modules[__name__].__dict__.get(\
                            TYPE_DICT[str(command.idType)])
             output.append(commandClass(content))
@@ -84,7 +85,7 @@ class CommandRestoredEntry():
     TODO
     """
     def __init__(self, content):
-        self.entryId = struct.unpack(types.int32, content.read(4))[0]
+        self.entryId = struct.unpack('i', content.read(4))[0]
 
     def __str__(self):
         return "RestoredEntry - Entry: %d" % self.entryId
@@ -94,10 +95,10 @@ class CommandWindow():
     TODO
     """
     def __init__(self, content):
-        self.windowId = struct.unpack(types.int32, content.read(4))[0]
-        self.selectedTabIndex = struct.unpack(types.int32, content.read(4))[0]
-        self.numTab = struct.unpack(types.int32, content.read(4))[0]
-        self.timestamp = struct.unpack(types.int64, content.read(8))[0]
+        self.windowId = struct.unpack('i', content.read(4))[0]
+        self.selectedTabIndex = struct.unpack('i', content.read(4))[0]
+        self.numTab = struct.unpack('i', content.read(4))[0]
+        self.timestamp = struct.unpack('l', content.read(8))[0]
 
     def __str__(self):
         return "CreateWindow - Window: %d, " % self.windowId +\
@@ -110,9 +111,9 @@ class CommandSelectedNavigationInTab():
     TODO
     """
     def __init__(self, content):
-        self.tabId = struct.unpack(types.int32, content.read(4))[0]
-        self.index = struct.unpack(types.int32, content.read(4))[0]
-        self.timestamp = struct.unpack(types.int64, content.read(8))[0]
+        self.tabId = struct.unpack('i', content.read(4))[0]
+        self.index = struct.unpack('i', content.read(4))[0]
+        self.timestamp = struct.unpack('l', content.read(8))[0]
 
     def __str__(self):
         return "SelectedNavigationInTab - Tab: %d, " % self.tabId +\
@@ -124,7 +125,7 @@ class CommandPinnedState():
     TODO
     """
     def __init__(self, content):
-        self.pinned = struct.unpack(types.int32, content.read(1))[0]
+        self.pinned = struct.unpack('i', content.read(1))[0]
 
     def __str__(self):
         return "PinnedState - Pinned: %d" % self.pinned

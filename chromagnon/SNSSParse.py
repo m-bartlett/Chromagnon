@@ -33,7 +33,7 @@ Reverse engineered from chrome/browser/sessions/*
 import os
 import struct
 
-import types
+import ctypes
 
 SNSS_MAGIC = 0x53534E53
 
@@ -47,18 +47,19 @@ def parse(path):
     f.seek(0, os.SEEK_END)
     end = f.tell()
     f.seek(0, os.SEEK_SET)
-    magic = struct.unpack(types.int32, f.read(4))[0]
+    #f.read(4)
+    magic = struct.unpack('i', f.read(4))[0]
     if magic != SNSS_MAGIC:
         raise Exception("Invalid file header!")
-    version = struct.unpack(types.int32, f.read(4))[0]
+    version = struct.unpack('i', f.read(4))[0]
 
     while (end - f.tell()) > 0:
         # commandSize is a uint16
-        commandSize = struct.unpack(types.uint16, f.read(2))[0]
+        commandSize = struct.unpack('H', f.read(2))[0]
         if commandSize == 0:
             raise Exception("Corrupted File!")
         # idType is a uint8
-        idType = struct.unpack(types.uint8, f.read(1))[0]
+        idType = struct.unpack('B', f.read(1))[0]
 
         # Size of idType is included in commandSize
         content = f.read(commandSize - 1)

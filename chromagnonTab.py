@@ -35,7 +35,7 @@ def main():
     snss = chromagnon.SNSSParse.parse(sys.argv[1])
     tabCommand = chromagnon.tabParse.parse(snss)
     for command in tabCommand:
-        print command
+        print(command)
 
 if __name__ == "__main__":
     main()
